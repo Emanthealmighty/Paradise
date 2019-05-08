@@ -4,6 +4,7 @@
  *		Resin
  *		Weeds
  *		Egg
+ *		Dumbegg
  */
 
 #define WEED_NORTH_EDGING "north"
@@ -310,6 +311,50 @@
 			return
 
 		Burst(0)
+
+/obj/structure/alien/dumbegg // Used by the simple animal version alien queen
+	name = "egg"
+	desc = "A large mottled egg."
+	icon_state = "egg_growing"
+	density = FALSE
+	anchored = TRUE
+	max_integrity = 100
+	integrity_failure = 5
+	var/status = GROWING	//can be GROWING, GROWN or BURST; all mutually exclusive
+	layer = MOB_LAYER
+	var/master_commander = null
+	var/faction = null
+	var/hatch_as = null
+
+/obj/structure/alien/dumbegg/New()
+	spawn(rand(MIN_GROWTH_TIME, MAX_GROWTH_TIME))
+		Grow()
+	if(status == BURST)
+		obj_integrity = integrity_failure
+
+/obj/structure/alien/dumbegg/proc/Grow()
+	spawn(rand(MIN_GROWTH_TIME, MAX_GROWTH_TIME)) // Egg's about to hatch
+		Hatch()
+	icon_state = "egg"
+	status = GROWN
+
+/obj/structure/alien/dumbegg/proc/Hatch()
+	if(status == GROWN || status == GROWING)
+		icon_state = "egg_hatched"
+		flick("egg_opening_nohugger", src)
+		status = BURSTING
+		spawn(15)
+			status = BURST
+			hatch_as = pick(/mob/living/simple_animal/hostile/alien, /mob/living/simple_animal/hostile/alien/sentinel, /mob/living/simple_animal/hostile/alien/drone)
+			var/mob/living/simple_animal/hostile/alien/A = new hatch_as(loc)
+			if(faction == null)
+				A.faction = "alien"
+			A.faction = faction
+			A.master_commander = master_commander
+			spawn(600)
+				qdel(src)
+
+
 
 #undef BURST
 #undef BURSTING
