@@ -1,5 +1,6 @@
 /mob/living/carbon/alien/larva
 	name = "alien larva"
+	desc = "A small snake-like creature. It's dripping with blood..."
 	real_name = "alien larva"
 	icon_state = "larva0"
 	pass_flags = PASSTABLE | PASSMOB
